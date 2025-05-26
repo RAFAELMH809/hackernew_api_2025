@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 import dj_database_url
+from decouple import config
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,6 +39,7 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -88,13 +91,27 @@ WSGI_APPLICATION = 'hackernews.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
-DATABASES = {
-    'default': dj_database_url.config(
+#DATABASES = {
+    #'default': dj_database_url.config(
         # Replace this value with your local database's connection string.
-        default='postgresql://postgres:postgres@localhost:5432/hackernews',
-        conn_max_age=600
-    )
+        #default='postgresql://postgres:postgres@localhost:5432/hackernews',
+        #conn_max_age=600
+   # )
+#}
+
+DATABASES = {
+    #'default': {
+    #   'ENGINE': 'django.db.backends.postgresql_psycopg2',
+    #   'NAME': 'hakernew',
+    #  'USER': 'haker',
+    #    'PASSWORD': '123456',
+    #    'PORT': '5432',
+    
+    #}
+    'default': dj_database_url.config(default=config('DATABASE_URL'))
 }
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #DATABASES = {
 #    'default': {
@@ -131,6 +148,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 TIME_ZONE = 'UTC'
 
@@ -151,8 +169,8 @@ if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
-
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATIC_URL = '/static/'
+    #STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 GRAPHENE = {
     'SCHEMA': 'mysite.myschema.schema',
     'MIDDLEWARE': [
